@@ -39,7 +39,7 @@ class CriticalDynamicsModel(chainer.Chain):
         h = x
         for i, layer in enumerate(self.convs):
             for conv in layer:
-                h = F.sigmoid(getattr(self, conv)(h))
+                h = F.relu(getattr(self, conv)(h))
 
             prepooling_size = h.data.shape[2:]
             self.unpooling_outsizes.append(prepooling_size)
@@ -79,33 +79,32 @@ class CriticalDynamicsModel(chainer.Chain):
 
         feat_maps = []
 
-        # for fm in range(h.data.shape[1]):  # For each feature map
-        #
-        #     print('Feature map {}'.format(fm))
-        #
-        #     condition = zeros.copy()
-        #     condition[0][fm] = 1  # Keep one feature map and zero all other
-        #     h = Variable(xp.where(condition, h_data, zeros))
-        #
-        #     for i, deconv in enumerate(reversed(deconvs)):
-        #         # h = F.unpooling_2d(h, self.switches[layer-i-1], 2, stride=2,
-        #         #                    outsize=self.unpooling_outsizes[layer-i-1])
-        #         for d in reversed(deconv):
-        #             h = getattr(self, d)(F.log(h/(1-h)))
-        #             # h = getattr(self, d)(F.relu(h))
-        #
-        #
-        #     feat_maps.append(h.data)
-        h = Variable(h_data)
-        for i, deconv in enumerate(reversed(deconvs)):
-            # h = F.unpooling_2d(h, self.switches[layer-i-1], 2, stride=2,
-            #                    outsize=self.unpooling_outsizes[layer-i-1])
-            for d in reversed(deconv):
-                h = F.clip(h, 0.0001, 0.9999)
-                h = getattr(self, d)(F.log(h/(1-h)))
-                # h = getattr(self, d)(F.relu(h))
+        for fm in range(h.data.shape[1]):  # For each feature map
 
-        feat_maps.append(h.data)
+            print('Feature map {}'.format(fm))
+
+            condition = zeros.copy()
+            condition[0][fm] = 1  # Keep one feature map and zero all other
+            h = Variable(xp.where(condition, h_data, zeros))
+
+            for i, deconv in enumerate(reversed(deconvs)):
+                # h = F.unpooling_2d(h, self.switches[layer-i-1], 2, stride=2,
+                #                    outsize=self.unpooling_outsizes[layer-i-1])
+                for d in reversed(deconv):
+                    h = getattr(self, d)(F.relu(h))
+
+
+            feat_maps.append(h.data)
+
+        # h = Variable(h_data)
+        # for i, deconv in enumerate(reversed(deconvs)):
+        #     # h = F.unpooling_2d(h, self.switches[layer-i-1], 2, stride=2,
+        #     #                    outsize=self.unpooling_outsizes[layer-i-1])
+        #     for d in reversed(deconv):
+        #         h = F.clip(h, 0.0001, 0.9999)
+        #         h = getattr(self, d)(F.log(h/(1-h)))
+        #         # h = getattr(self, d)(F.relu(h))
+
         feat_maps = xp.array(feat_maps)
         feat_maps = xp.rollaxis(feat_maps, 0, 2)  # Batch to first axis
 

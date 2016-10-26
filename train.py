@@ -19,7 +19,7 @@ os.environ['PATH'] += ':/usr/local/cuda-7.5/bin'
 parser = argparse.ArgumentParser(description='next pred')
 parser.add_argument('--gpu', '-g', default=-1, type=int)
 parser.add_argument('--batchsize', '-b', default=1, type=int)
-parser.add_argument('--epoch', '-e', default=1, type=int)
+parser.add_argument('--epoch', '-e', default=100, type=int)
 args = parser.parse_args()
 
 # make model.
@@ -72,5 +72,5 @@ for epoch in six.moves.range(1, n_epoch + 1):
     print('test mean loss: {}'.format(float(loss.data)))
 
 # save model.
-pickle.dump(model, open('result/model.pkl', 'wb'), protocol=2)
-pickle.dump(optimizer, open('result/optimizer.pkl', 'wb'), protocol=2)
+pickle.dump(model, open('result/model1026.pkl', 'wb'), protocol=2)
+pickle.dump(optimizer, open('result/optimizer1026.pkl', 'wb'), protocol=2)

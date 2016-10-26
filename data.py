@@ -68,7 +68,7 @@ def detect_face():
 
 
 def make_txtfile():
-    name_list = ['Hillary Clinton', 'bill Clinton']
+    name_list = ['Hillary', 'bill']
     processed_dir = './processed_image/'
 
     with open('label.txt', 'w') as f:
@@ -103,7 +103,7 @@ def random_brightness(image, max_delta=63, seed=None):
 def random_contrast(image, lower, upper, seed=None):
     f = np.random.uniform(-lower, upper)
     mean = (image[0] + image[1] + image[2]).astype(np.float32) / 3
-    ximg = xp.zeros(image.shape, xp.float32)
+    ximg = np.zeros(image.shape, np.float32)
     for i in range(0, 3):
         ximg[i] = (image[i] - mean) * f + mean
     return ximg
@@ -126,10 +126,11 @@ def image_whitening(img):
 class Data(object):
     def __init__(self):
         data = load_image_list('data.txt')
+        random.shuffle(data)
         n_data = len(data)
         self.insize = 128
-        self.train = data[:n_data / 10 * -1]
-        self.test = data[n_data / 10 * -1:]
+        self.train = data[:n_data / 5 * -1]
+        self.test = data[n_data / 5 * -1:]
         self.N = len(self.train)
         self.crop_noize = 5
         self.TEST_N = len(self.test)
@@ -151,10 +152,10 @@ class Data(object):
         if flip and random.randint(0, 1) == 0:
             image = image[:, :, ::-1]
         # random brightness
-        if random.randint(0, 1) == 0:
+        if random.randint(0, 3) != 0:
             image = random_brightness(image)
         # random contrast
-        if random.randint(0, 1) == 0:
+        if random.randint(0, 3) != 0:
             image = random_contrast(image, lower=0.2, upper=1.8)
         # whitening
         image = image_whitening(image)
@@ -186,7 +187,7 @@ class Data(object):
 
 
 if __name__ == '__main__':
-    collect_data()
-    detect_face()
+    # collect_data()
+    # detect_face()
     make_txtfile()
     pass

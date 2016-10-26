@@ -10,8 +10,10 @@ import matplotlib.image as mpimg
 
 def tile_ims(filename, directory):
     """Load all images in the given directory and tile them into one."""
+    im_path = os.listdir(directory)
+    im_path = filter(lambda x: x[0] != '.', im_path)
     ims = [mpimg.imread(os.path.join(directory, f)) for f in
-           sorted(os.listdir(directory))]
+           sorted(im_path)]
     save_ims(filename, np.array(ims))
 
 

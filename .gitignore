@@ -2,8 +2,11 @@ result
 model
 processed_image
 images
+raw_image
 activations
 VGG.model
+
+*.txt
 
 *.swo
 *.swp

@@ -94,8 +94,8 @@ if __name__ == '__main__':
     model = pickle.load(open('result/model.pkl','r'))
 
     # Visualize each of the 5 convolutional layers in VGG
-    # for layer in range(5):
-    #     save_activations(model, sample_im(), layer, 'activations')
-    save_activations(model, sample_im(), 0, 'activations')
+    for layer in range(2):
+        save_activations(model, sample_im(), layer, 'activations')
+    # save_activations(model, sample_im(), 0, 'activations')
 
     print('Done')
