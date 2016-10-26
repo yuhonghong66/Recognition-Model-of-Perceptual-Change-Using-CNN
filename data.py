@@ -17,7 +17,7 @@ from detector import detect
 
 def collect_data():
     key = "TIwk7p7nC7HlKijRb5Z42IHx0S2+MKHqAS0BNIOdKqM"
-    name_list = ['ヒラリー・クリントン', 'ビル・クリントン']
+    name_list = ['Hillary Clinton', 'bill clinton']
     bing = Bing(key)
     save_dir = './raw_image/'
 
@@ -30,7 +30,7 @@ def collect_data():
         if not os.path.exists(save_dir):
             os.mkdir(save_dir)
 
-        results = bing.web_search(name, 200, ["MediaUrl"])
+        results = bing.web_search(name, 300, ["MediaUrl"])
 
         for num, result in enumerate(results):
             try:
@@ -41,7 +41,7 @@ def collect_data():
 
 
 def detect_face():
-    name_list = ['ヒラリー・クリントン', 'ビル・クリントン']
+    name_list = ['Hillary Clinton', 'bill clinton']
     processed_dir = './processed_image/'
     if not os.path.exists(processed_dir):
         os.mkdir(processed_dir)
@@ -68,7 +68,7 @@ def detect_face():
 
 
 def make_txtfile():
-    name_list = ['ヒラリー・クリントン', 'ビル・クリントン']
+    name_list = ['Hillary Clinton', 'bill Clinton']
     processed_dir = './processed_image/'
 
     with open('label.txt', 'w') as f:
@@ -94,6 +94,35 @@ def load_image_list(path):
     return tuples
 
 
+def random_brightness(image, max_delta=63, seed=None):
+    delta = np.random.uniform(-max_delta, max_delta)
+    newimg = image + delta
+    return newimg
+
+
+def random_contrast(image, lower, upper, seed=None):
+    f = np.random.uniform(-lower, upper)
+    mean = (image[0] + image[1] + image[2]).astype(np.float32) / 3
+    ximg = xp.zeros(image.shape, xp.float32)
+    for i in range(0, 3):
+        ximg[i] = (image[i] - mean) * f + mean
+    return ximg
+
+
+def image_whitening(img):
+    img = img.astype(np.float32)
+    d, w, h = img.shape
+    num_pixels = d * w * h
+    mean = img.mean()
+    variance = np.mean(np.square(img)) - np.square(mean)
+    stddev = np.sqrt(variance)
+    min_stddev = 1.0 / np.sqrt(num_pixels)
+    scale = stddev if stddev > min_stddev else min_stddev
+    img -= mean
+    img /= scale
+    return img
+
+
 class Data(object):
     def __init__(self):
         data = load_image_list('data.txt')
@@ -102,19 +131,36 @@ class Data(object):
         self.train = data[:n_data / 10 * -1]
         self.test = data[n_data / 10 * -1:]
         self.N = len(self.train)
+        self.crop_noize = 5
         self.TEST_N = len(self.test)
 
-    def read_image(self, path):
+    def read_image(self, path, flip=True):
         # Data loading routine
-        resize_img = Image.open(path).resize((self.insize, self.insize))
+        resize_img = Image.open(path).resize((self.insize + self.crop_noize
+                                              , self.insize + self.crop_noize))
         img = np.asarray(resize_img).transpose(2, 0, 1)
-        img = img.astype(np.float32)
-        img /= 255
 
+        # random crop
+        top = random.randint(0, self.crop_noize)
+        left = random.randint(0, self.crop_noize)
+        bottom = self.insize + top
+        right = self.insize + left
+        image = img[:, top:bottom, left:right].astype(np.float32)
+
+        # left-right flipping
+        if flip and random.randint(0, 1) == 0:
+            image = image[:, :, ::-1]
+        # random brightness
         if random.randint(0, 1) == 0:
-            return img[:, :, ::-1]
-        else:
-            return img
+            image = random_brightness(image)
+        # random contrast
+        if random.randint(0, 1) == 0:
+            image = random_contrast(image, lower=0.2, upper=1.8)
+        # whitening
+        image = image_whitening(image)
+
+        image /= 255
+        return image
 
     def get(self, index, test=False):
         # send list or tuple data (not numpy)
@@ -141,6 +187,6 @@ class Data(object):
 
 if __name__ == '__main__':
     # collect_data()
-    # detect_face()
+    detect_face()
     make_txtfile()
     pass
