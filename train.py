@@ -72,5 +72,5 @@ for epoch in six.moves.range(1, n_epoch + 1):
     print('test mean loss: {}'.format(float(loss.data)))
 
 # save model.
-pickle.dump(model, open('result/model1026.pkl', 'wb'), protocol=2)
-pickle.dump(optimizer, open('result/optimizer1026.pkl', 'wb'), protocol=2)
+pickle.dump(model, open('result/model4l.pkl', 'wb'), protocol=2)
+pickle.dump(optimizer, open('result/optimizer4l.pkl', 'wb'), protocol=2)

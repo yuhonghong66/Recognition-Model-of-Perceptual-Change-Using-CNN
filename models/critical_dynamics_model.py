@@ -17,6 +17,8 @@ class CriticalDynamicsModel(chainer.Chain):
         super(CriticalDynamicsModel, self).__init__(
             conv1=L.Convolution2D(3, 64, 4, stride=4, nobias=nobias),
             conv2=L.Convolution2D(64, 64, 3, stride=2, nobias=nobias),
+            conv3=L.Convolution2D(64, 64, 3, stride=1, nobias=nobias),
+            conv4=L.Convolution2D(64, 32, 3, stride=1, nobias=nobias),
 
             # fc6=L.Linear(25088, 4096),
             fc6=L.Linear(14400, 2),
@@ -24,28 +26,20 @@ class CriticalDynamicsModel(chainer.Chain):
         self.convs = [
             ['conv1'],
             ['conv2'],
+            ['conv3'],
+            ['conv4'],
         ]
 
         self.train = False
-        self.switches = []
-        self.unpooling_outsizes = []
         self.added_deconv = False
 
     def __call__(self, x, t=None, stop_layer=None):
-        self.switches = []
-        self.unpooling_outsizes = []
 
         # Forward pass through convolutional layers with ReLU and pooling
         h = x
         for i, layer in enumerate(self.convs):
             for conv in layer:
                 h = F.relu(getattr(self, conv)(h))
-
-            prepooling_size = h.data.shape[2:]
-            self.unpooling_outsizes.append(prepooling_size)
-
-            # h, switches = F.max_pooling_2d(h, 2, stride=2)
-            # self.switches.append(switches)
 
             if stop_layer == i + 1:
                 return h
@@ -88,8 +82,6 @@ class CriticalDynamicsModel(chainer.Chain):
             h = Variable(xp.where(condition, h_data, zeros))
 
             for i, deconv in enumerate(reversed(deconvs)):
-                # h = F.unpooling_2d(h, self.switches[layer-i-1], 2, stride=2,
-                #                    outsize=self.unpooling_outsizes[layer-i-1])
                 for d in reversed(deconv):
                     h = getattr(self, d)(F.relu(h))
 

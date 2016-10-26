@@ -91,7 +91,7 @@ if __name__ == '__main__':
     print('Preparing the model...')
     # model = VGG()
     # serializers.load_hdf5('VGG.model', model)
-    model = pickle.load(open('result/model.pkl','r'))
+    model = pickle.load(open('result/model1026.pkl','r'))
 
     # Visualize each of the 5 convolutional layers in VGG
     for layer in range(2):
