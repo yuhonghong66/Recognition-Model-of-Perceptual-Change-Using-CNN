@@ -1,3 +1,10 @@
+result
+model
+processed_image
+images
+activations
+VGG.model
+
 *.swo
 *.swp
 

@@ -5,6 +5,10 @@ from chainer import serializers
 from chainer import Variable
 from models.VGG import VGG
 from utils import imgutil
+try:
+    import cPickle as pickle
+except:
+    import pickle
 
 
 """
@@ -16,11 +20,11 @@ TODO
 
 def sample_im():
     """Return a preprocessed (averaged and resized to VGG) sample image."""
-    mean = np.array([103.939, 116.779, 123.68])
-    im = cv.imread('images/cat.jpg').astype(np.float32)
-    im -= mean
-    im = cv.resize(im, (224, 224)).transpose((2, 0, 1))
-    im = im[np.newaxis, :, :, :]
+    # mean = np.array([103.939, 116.779, 123.68])
+    im = cv.imread('images/double.jpg').astype(np.float32)
+    # im -= mean
+    im = cv.resize(im, (128, 128)).transpose((2, 0, 1))
+    im = im[np.newaxis, :, :, :] / 255.0
     return im
 
 
@@ -85,11 +89,13 @@ def save_activations(model, x, layer, dst_root):
 
 if __name__ == '__main__':
     print('Preparing the model...')
-    model = VGG()
-    serializers.load_hdf5('VGG.model', model)
+    # model = VGG()
+    # serializers.load_hdf5('VGG.model', model)
+    model = pickle.load(open('result/model.pkl','r'))
 
     # Visualize each of the 5 convolutional layers in VGG
-    for layer in range(5):
-        save_activations(model, sample_im(), layer, 'activations')
+    # for layer in range(5):
+    #     save_activations(model, sample_im(), layer, 'activations')
+    save_activations(model, sample_im(), 0, 'activations')
 
     print('Done')
