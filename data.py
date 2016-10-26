@@ -132,7 +132,7 @@ class Data(object):
         self.train = data[:n_data / 5 * -1]
         self.test = data[n_data / 5 * -1:]
         self.N = len(self.train)
-        self.crop_noize = 5
+        self.crop_noize = 7
         self.TEST_N = len(self.test)
 
     def read_image(self, path, flip=True):
@@ -152,10 +152,10 @@ class Data(object):
         if flip and random.randint(0, 1) == 0:
             image = image[:, :, ::-1]
         # random brightness
-        if random.randint(0, 3) != 0:
+        if random.randint(0, 4) != 0:
             image = random_brightness(image)
         # random contrast
-        if random.randint(0, 3) != 0:
+        if random.randint(0, 4) != 0:
             image = random_contrast(image, lower=0.2, upper=1.8)
         # whitening
         image = image_whitening(image)
