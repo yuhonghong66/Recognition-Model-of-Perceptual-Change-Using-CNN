@@ -19,7 +19,7 @@ os.environ['PATH'] += ':/usr/local/cuda-7.5/bin'
 parser = argparse.ArgumentParser(description='next pred')
 parser.add_argument('--gpu', '-g', default=-1, type=int)
 parser.add_argument('--batchsize', '-b', default=1, type=int)
-parser.add_argument('--epoch', '-e', default=100, type=int)
+parser.add_argument('--epoch', '-e', default=30, type=int)
 args = parser.parse_args()
 
 # make model.
