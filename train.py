@@ -76,7 +76,7 @@ for epoch in six.moves.range(1, n_epoch + 1):
     print('test mean loss: {}'.format(float(loss.data)))
     if not os.path.exists(log_dir+'/loss.txt'):
         with open(log_dir+'/loss.txt', 'a') as f:
-            f.write('epoch,train_loss,test_loss\n')
+            f.write('learn_t,train_loss,test_loss\n')
     with open(log_dir+'/loss.txt', 'a') as f:
         f.write(str(epoch) + ',' + str(sum_loss / data.N) + ',' + str(loss.data) + '\n')
 
