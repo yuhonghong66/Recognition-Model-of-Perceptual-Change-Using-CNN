@@ -12,6 +12,8 @@ from chainer import cuda
 from chainer import optimizers
 from data import Data
 from models.critical_dynamics_model import CriticalDynamicsModel
+from utils.prepare_output_dir import prepare_output_dir
+from utils.plot_scores import plot_scores
 
 os.environ['PATH'] += ':/usr/local/cuda-7.5/bin'
 
@@ -40,6 +42,8 @@ n_epoch = args.epoch
 data = Data()
 N = data.N
 TEST_N = data.TEST_N
+
+log_dir = prepare_output_dir(args)
 
 # Learning loop
 for epoch in six.moves.range(1, n_epoch + 1):
@@ -70,7 +74,13 @@ for epoch in six.moves.range(1, n_epoch + 1):
 
     loss = model(x, t)
     print('test mean loss: {}'.format(float(loss.data)))
+    if not os.path.exists(log_dir+'/loss.txt'):
+        with open(log_dir+'/loss.txt', 'a') as f:
+            f.write('epoch,train_loss,test_loss\n')
+    with open(log_dir+'/loss.txt', 'a') as f:
+        f.write(str(epoch) + ',' + str(sum_loss / data.N) + ',' + str(loss.data) + '\n')
 
 # save model.
-pickle.dump(model, open('result/model4l.pkl', 'wb'), protocol=2)
-pickle.dump(optimizer, open('result/optimizer4l.pkl', 'wb'), protocol=2)
+pickle.dump(model, open(log_dir + '/model.pkl', 'wb'), protocol=2)
+pickle.dump(optimizer, open(log_dir + '/optimizer.pkl', 'wb'), protocol=2)
+plot_scores(log_dir+'/loss.txt')

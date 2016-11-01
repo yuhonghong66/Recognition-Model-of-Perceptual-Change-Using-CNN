@@ -10,9 +10,9 @@ try:
 except:
    import pickle
 
-from scraper import scrape_image
-from bing import Bing
-from detector import detect
+from utils.face_scrape.scraper import scrape_image
+from utils.face_scrape.bing import Bing
+from utils.face_scrape.detector import detect
 
 
 def collect_data():
