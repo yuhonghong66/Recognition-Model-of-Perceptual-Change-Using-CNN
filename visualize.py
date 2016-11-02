@@ -1,4 +1,5 @@
 import os
+import argparse
 import numpy as np
 import cv2 as cv
 from chainer import serializers
@@ -88,14 +89,21 @@ def save_activations(model, x, layer, dst_root):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='next pred')
+    parser.add_argument('--directory', '-d', type=str)
+    args = parser.parse_args()
+
     print('Preparing the model...')
     # model = VGG()
     # serializers.load_hdf5('VGG.model', model)
-    model = pickle.load(open('result/model1026.pkl','r'))
+    model = pickle.load(open(args.directory + 'model.pkl','r'))
+    outdir = args.directory + 'activations'
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
 
     # Visualize each of the 5 convolutional layers in VGG
     for layer in range(2):
-        save_activations(model, sample_im(), layer, 'activations')
+        save_activations(model, sample_im(), layer, outdir)
     # save_activations(model, sample_im(), 0, 'activations')
 
     print('Done')
