@@ -30,6 +30,8 @@ model.train = True
 optimizer = optimizers.Adam()
 # optimizer.use_cleargrads()
 optimizer.setup(model)
+optimizer.add_hook(chainer.optimizer.WeightDecay(0.0005))
+
 if args.gpu >= 0:
     cuda.get_device(args.gpu).use()
     model.to_gpu()
