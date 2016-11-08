@@ -94,7 +94,6 @@ class CriticalDynamicsModel(chainer.Chain):
                 for d in reversed(deconv):
                     h = getattr(self, d)(F.relu(h))
 
-
             feat_maps.append(h.data)
 
         # h = Variable(h_data)
