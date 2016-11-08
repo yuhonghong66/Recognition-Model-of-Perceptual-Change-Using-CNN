@@ -10,7 +10,7 @@ except:
 import chainer
 from chainer import cuda
 from chainer import optimizers
-from data import Data
+from utils.ML.data import Data
 from models.critical_dynamics_model import CriticalDynamicsModel
 from utils.prepare_output_dir import prepare_output_dir
 from utils.plot_scores import plot_scores
