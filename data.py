@@ -3,6 +3,7 @@ import cv2
 import os
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from PIL import Image
 import random
 try:
@@ -94,18 +95,19 @@ def load_image_list(path):
     return tuples
 
 
-def random_brightness(image, max_delta=63, seed=None):
-    delta = np.random.uniform(-max_delta, max_delta)
-    newimg = image + delta
+def random_brightness(image, max_delta=0.5, seed=None):
+    delta = np.random.uniform(1-max_delta, 1+max_delta)
+    newimg = np.clip(image * delta, 0, 255)
     return newimg
 
 
-def random_contrast(image, lower, upper, seed=None):
-    f = np.random.uniform(-lower, upper)
+def random_contrast(image, lower=0.2, upper=1.8, seed=None):
+    f = np.random.uniform(lower, upper)
     mean = (image[0] + image[1] + image[2]).astype(np.float32) / 3
     ximg = np.zeros(image.shape, np.float32)
     for i in range(0, 3):
         ximg[i] = (image[i] - mean) * f + mean
+    ximg = np.clip(ximg, 0, 255)
     return ximg
 
 
@@ -135,30 +137,34 @@ class Data(object):
         self.crop_noize = 7
         self.TEST_N = len(self.test)
 
-    def read_image(self, path, flip=True):
+    def read_image(self, path, train=True):
         # Data loading routine
-        resize_img = Image.open(path).resize((self.insize + self.crop_noize
-                                              , self.insize + self.crop_noize))
-        img = np.asarray(resize_img).transpose(2, 0, 1)
-
         # random crop
-        top = random.randint(0, self.crop_noize)
-        left = random.randint(0, self.crop_noize)
-        bottom = self.insize + top
-        right = self.insize + left
-        image = img[:, top:bottom, left:right].astype(np.float32)
+        if train:
+            resize_img = Image.open(path).resize((self.insize + self.crop_noize
+                                                  , self.insize + self.crop_noize))
+            img = np.asarray(resize_img).transpose(2, 0, 1)
+            top = random.randint(0, self.crop_noize)
+            left = random.randint(0, self.crop_noize)
+            bottom = self.insize + top
+            right = self.insize + left
+            image = img[:, top:bottom, left:right].astype(np.float32)
+        else:
+            resize_img = Image.open(path).resize((self.insize, self.insize))
+            img = np.asarray(resize_img).transpose(2, 0, 1)
+            image = img.astype(np.float32)
 
         # left-right flipping
-        if flip and random.randint(0, 1) == 0:
+        if train and random.randint(0, 1) == 0:
             image = image[:, :, ::-1]
         # random brightness
-        if random.randint(0, 4) != 0:
+        if train and random.randint(0, 4) != 0:
             image = random_brightness(image)
         # random contrast
-        if random.randint(0, 4) != 0:
-            image = random_contrast(image, lower=0.2, upper=1.8)
+        if train and random.randint(0, 4) != 0:
+            image = random_contrast(image)
         # whitening
-        image = image_whitening(image)
+        # image = image_whitening(image)
 
         image /= 255
         return image
@@ -178,7 +184,8 @@ class Data(object):
         for k, idx in enumerate(index):
             path = data_set[idx][0]
             target = data_set[idx][1]
-            img = self.read_image(path)
+            train = not test
+            img = self.read_image(path, train=train)
             #TODO: tolist may be very slow!
             x_batch[k] = img
             t_batch[k] = target
