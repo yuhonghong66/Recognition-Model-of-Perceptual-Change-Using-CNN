@@ -18,7 +18,7 @@ class CriticalDynamicsModel(chainer.Chain):
             conv1=L.Convolution2D(3, 64, 3, stride=2, nobias=nobias),
             conv2=L.Convolution2D(64, 64, 3, stride=2, nobias=nobias),
             conv3=L.Convolution2D(64, 128, 4, stride=1, nobias=nobias),
-
+            attention=L.Linear(2, 1152),
             # fc6=L.Linear(25088, 4096),
             fc6=L.Linear(1152, 2),
         )
@@ -53,6 +53,38 @@ class CriticalDynamicsModel(chainer.Chain):
 
         h = self.fc6(h)
 
+        if self.train:
+            self.loss = F.softmax_cross_entropy(h, t)
+            self.acc = F.accuracy(h, t)
+            return self.loss
+        else:
+            self.pred = F.softmax(h)
+            return self.pred
+
+    def forward_with_attention(self, x, a, t, stop_layer=None):
+        self.switches = []
+        self.unpooling_outsizes = []
+
+        # Forward pass through convolutional layers with ReLU and pooling
+        h = x
+        for i, layer in enumerate(self.convs):
+            for conv in layer:
+                h = F.relu(getattr(self, conv)(h))
+
+            prepooling_size = h.data.shape[2:]
+            self.unpooling_outsizes.append(prepooling_size)
+            h, switches = F.max_pooling_2d(h, 2, stride=2)
+            self.switches.append(switches)
+
+            if stop_layer == i + 1:
+                return h
+
+        h = F.reshape(h, (h.data.shape[0], 1152))
+
+        attention = F.sigmoid(self.attention(a))
+
+        h = attention * h
+        h = self.fc6(h)
         if self.train:
             self.loss = F.softmax_cross_entropy(h, t)
             self.acc = F.accuracy(h, t)
