@@ -90,14 +90,12 @@ def save_activations(model, x, layer, dst_root):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='next pred')
-    parser.add_argument('--directory', '-d', type=str)
+    parser.add_argument('model', type=str)
     args = parser.parse_args()
 
     print('Preparing the model...')
-    # model = VGG()
-    # serializers.load_hdf5('VGG.model', model)
-    model = pickle.load(open(args.directory + 'model.pkl','r'))
-    outdir = args.directory + 'activations'
+    model = pickle.load(open(args.model,'r'))
+    outdir = args.model[:-9] + 'activations'
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 

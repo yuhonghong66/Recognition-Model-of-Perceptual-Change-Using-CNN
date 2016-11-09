@@ -104,6 +104,6 @@ if __name__ == '__main__':
     validator = Validator(model, data)
     validator.validate_all(test=args.test)
     # validator.validate_sample(test=args.test)
-    # validator.validate(test=args.test)
+    validator.validate(test=args.test)
 
 
