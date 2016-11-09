@@ -24,7 +24,8 @@ class Validator(object):
         self.model = model
         self.data = data
 
-    def validate(self, test=True):
+    def validate(self, test=True, attention=False):
+        print("start validation!")
         while True:
             if test:
                 index = [random.randint(0, data.TEST_N - 1)]
@@ -35,7 +36,13 @@ class Validator(object):
 
             x_batch, t_batch = self.data.get(index=index, test=test)
             x = chainer.Variable(np.asarray(x_batch))
-            pred_t = self.model(x).data[0]
+            if attention:
+                a_batch = np.eye(2)[t_batch].astype(np.float32)
+                a = chainer.Variable(np.asarray(a_batch))
+                t = chainer.Variable(np.asarray(t_batch))
+                pred_t = self.model.forward_with_attention(x, a, t).data[0]
+            else:
+                pred_t = self.model(x).data[0]
 
             print("Print t_batch")
             print(t_batch[0])
@@ -51,7 +58,8 @@ class Validator(object):
             if key == 'q':
                 return
 
-    def validate_all(self, test=True):
+    def validate_all(self, test=True, attention=False):
+        print("validate all picture!")
         score = 0.0
         if test:
             indexes = range(data.TEST_N)
@@ -61,15 +69,32 @@ class Validator(object):
         for index in indexes:
             x_batch, t_batch = self.data.get(index=[index], test=test)
             x = chainer.Variable(np.asarray(x_batch))
-            pred_t = self.model(x).data[0]
+            if attention:
+                a_batch = np.eye(2)[t_batch].astype(np.float32)
+                a = chainer.Variable(np.asarray(a_batch))
+                t = chainer.Variable(np.asarray(t_batch))
+                pred_t = self.model.forward_with_attention(x, a, t).data[0]
+            else:
+                pred_t = self.model(x).data[0]
             if t_batch == np.argmax(pred_t):
                 score += 1
         print(score / len(indexes))
 
-
-    def validate_sample(self, test=True):
+    def validate_sample(self, test=True, attention=None):
+        print("sample image!")
+        if attention is 0:
+            print("Hirally")
+        elif attention is 1:
+            print("Bill")
         x = chainer.Variable(sample_im())
-        pred_t = self.model(x).data[0]
+        if attention in [0, 1]:
+            t_batch = [[attention]]
+            a_batch = np.eye(2)[t_batch].astype(np.float32)
+            a = chainer.Variable(np.asarray(a_batch))
+            t = chainer.Variable(np.asarray(t_batch))
+            pred_t = self.model.forward_with_attention(x, a, t).data[0]
+        else:
+            pred_t = self.model(x).data[0]
         print("Print prediction")
         print(pred_t)
 
@@ -102,8 +127,13 @@ if __name__ == '__main__':
     data = Data()
 
     validator = Validator(model, data)
-    validator.validate_all(test=args.test)
+    # validator.validate_all(test=args.test)
     # validator.validate_sample(test=args.test)
-    validator.validate(test=args.test)
+    # validator.validate(test=args.test)
+    print("Use attention!")
+    validator.validate_all(test=args.test, attention=True)
+    validator.validate(test=args.test, attention=True)
+    validator.validate_sample(test=args.test, attention=0)
+    validator.validate_sample(test=args.test, attention=1)
 
 

@@ -61,7 +61,7 @@ class CriticalDynamicsModel(chainer.Chain):
             self.pred = F.softmax(h)
             return self.pred
 
-    def forward_with_attention(self, x, a, t, stop_layer=None):
+    def forward_with_attention(self, x, a, t=None, stop_layer=None):
         self.switches = []
         self.unpooling_outsizes = []
 
