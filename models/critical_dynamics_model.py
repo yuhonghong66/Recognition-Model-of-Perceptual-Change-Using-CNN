@@ -81,7 +81,7 @@ class CriticalDynamicsModel(chainer.Chain):
 
         h = F.reshape(h, (h.data.shape[0], 1152))
 
-        attention = F.sigmoid(self.attention(a))
+        attention = self.attention(a)
 
         h = attention * h
         h = self.fc6(h)

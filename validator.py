@@ -82,12 +82,9 @@ class Validator(object):
 
     def validate_sample(self, test=True, attention=None):
         print("sample image!")
-        if attention is 0:
-            print("Hirally")
-        elif attention is 1:
-            print("Bill")
         x = chainer.Variable(sample_im())
         if attention in [0, 1]:
+            print(attention)
             t_batch = [[attention]]
             a_batch = np.eye(2)[t_batch].astype(np.float32)
             a = chainer.Variable(np.asarray(a_batch))
@@ -127,9 +124,9 @@ if __name__ == '__main__':
     data = Data()
 
     validator = Validator(model, data)
-    # validator.validate_all(test=args.test)
-    # validator.validate_sample(test=args.test)
-    # validator.validate(test=args.test)
+    validator.validate_all(test=args.test)
+    validator.validate_sample(test=args.test)
+    validator.validate(test=args.test)
     print("Use attention!")
     validator.validate_all(test=args.test, attention=True)
     validator.validate(test=args.test, attention=True)
