@@ -51,6 +51,22 @@ class Validator(object):
             if key == 'q':
                 return
 
+    def validate_all(self, test=True):
+        score = 0.0
+        if test:
+            indexes = range(data.TEST_N)
+        else:
+            indexes= range(data.N)
+
+        for index in indexes:
+            x_batch, t_batch = self.data.get(index=[index], test=test)
+            x = chainer.Variable(np.asarray(x_batch))
+            pred_t = self.model(x).data[0]
+            if t_batch == np.argmax(pred_t):
+                score += 1
+        print(score / len(indexes))
+
+
     def validate_sample(self, test=True):
         x = chainer.Variable(sample_im())
         pred_t = self.model(x).data[0]
@@ -86,8 +102,8 @@ if __name__ == '__main__':
     data = Data()
 
     validator = Validator(model, data)
-    validator.validate_sample(test=args.test)
-    validator.validate(test=args.test)
-    validator.validate(test=args.test)
+    validator.validate_all(test=args.test)
+    # validator.validate_sample(test=args.test)
+    # validator.validate(test=args.test)
 
 
