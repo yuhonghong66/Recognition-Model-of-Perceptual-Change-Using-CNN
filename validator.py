@@ -5,6 +5,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import cv2 as cv
 try:
     import cPickle as pickle
 except:
@@ -50,6 +51,22 @@ class Validator(object):
             if key == 'q':
                 return
 
+    def validate_sample(self, test=True):
+        x = chainer.Variable(sample_im())
+        pred_t = self.model(x).data[0]
+        print("Print prediction")
+        print(pred_t)
+
+
+def sample_im():
+    """Return a preprocessed (averaged and resized to VGG) sample image."""
+    # mean = np.array([103.939, 116.779, 123.68])
+    im = cv.imread('images/double.jpg').astype(np.float32)
+    # im -= mean
+    im = cv.resize(im, (128, 128)).transpose((2, 0, 1))
+    im = im[np.newaxis, :, :, :] / 255.0
+    return im
+
 
 if __name__ == '__main__':
     # parse args
@@ -69,6 +86,8 @@ if __name__ == '__main__':
     data = Data()
 
     validator = Validator(model, data)
+    validator.validate_sample(test=args.test)
+    validator.validate(test=args.test)
     validator.validate(test=args.test)
 
 
