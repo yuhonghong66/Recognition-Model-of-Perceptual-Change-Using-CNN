@@ -43,7 +43,7 @@ xp = np if args.gpu < 0 else cuda.cupy
 batchsize = args.batchsize
 n_epoch = args.epoch
 
-data = Data()
+data = Data(k=5)
 N = data.N
 TEST_N = data.TEST_N
 
@@ -87,6 +87,10 @@ for epoch in six.moves.range(1, n_epoch + 1):
             f.write('learn_t,train_loss,test_loss\n')
     with open(log_dir+'/loss.txt', 'a') as f:
         f.write(str(epoch) + ',' + str(sum_loss / data.N) + ',' + str(loss.data) + '\n')
+
+    if epoch % 20 == 0:
+        pickle.dump(model, open(log_dir + '/model' + str(epoch) + '.pkl', 'wb'), protocol=2)
+        pickle.dump(optimizer, open(log_dir + '/optimizer' + str(epoch) + '.pkl', 'wb'), protocol=2)
 
 # save model.
 pickle.dump(model, open(log_dir + '/model.pkl', 'wb'), protocol=2)
