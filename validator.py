@@ -127,10 +127,10 @@ if __name__ == '__main__':
     validator.validate_all(test=args.test)
     validator.validate_sample(test=args.test)
     validator.validate(test=args.test)
-    print("Use attention!")
-    validator.validate_all(test=args.test, attention=True)
-    validator.validate(test=args.test, attention=True)
-    validator.validate_sample(test=args.test, attention=0)
-    validator.validate_sample(test=args.test, attention=1)
+    # print("Use attention!")
+    # validator.validate_all(test=args.test, attention=True)
+    # validator.validate(test=args.test, attention=True)
+    # validator.validate_sample(test=args.test, attention=0)
+    # validator.validate_sample(test=args.test, attention=1)
 
 

@@ -78,12 +78,16 @@ class CriticalDynamicsModel(chainer.Chain):
 
             if stop_layer == i + 1:
                 return h
-
+        shape = h.data.shape
         h = F.reshape(h, (h.data.shape[0], 1152))
 
         attention = self.attention(a)
 
         h = attention * h
+        if stop_layer == 'attention':
+            h = F.reshape(h, shape)
+            return h
+
         h = self.fc6(h)
         if self.train:
             self.loss = F.softmax_cross_entropy(h, t)
