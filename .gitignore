@@ -6,7 +6,8 @@ raw_image
 activations
 VGG.model
 
-*.txt
+data.txt*
+label.txt
 
 *.swo
 *.swp
