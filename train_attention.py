@@ -89,7 +89,7 @@ for epoch in six.moves.range(1, n_epoch + 1):
     with open(log_dir+'/loss.txt', 'a') as f:
         f.write(str(epoch) + ',' + str(sum_loss / data.N) + ',' + str(loss.data) + '\n')
 
-    if epoch % args.save == 0:
+    if epoch % args.save_turn == 0:
         print("save model.")
         pickle.dump(model, open(log_dir + '/model' + str(epoch) + '.pkl', 'wb'), protocol=2)
         pickle.dump(optimizer, open(log_dir + '/optimizer' + str(epoch) + '.pkl', 'wb'), protocol=2)
