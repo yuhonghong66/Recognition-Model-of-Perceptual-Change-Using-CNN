@@ -110,8 +110,11 @@ if __name__ == '__main__':
     # parse args
     parser = argparse.ArgumentParser(description='yuragi')
     parser.add_argument('model', type=str)
-    parser.add_argument('--test', default=True)
+    parser.add_argument('--use_train_data', action='store_true')
+    parser.add_argument('--no_attention', action='store_true')
     args = parser.parse_args()
+
+    test = not args.use_train_data
 
     # make model.
     print(args.model)
@@ -124,13 +127,14 @@ if __name__ == '__main__':
     data = Data()
 
     validator = Validator(model, data)
-    validator.validate_all(test=args.test)
-    validator.validate_sample(test=args.test)
-    validator.validate(test=args.test)
-    # print("Use attention!")
-    # validator.validate_all(test=args.test, attention=True)
-    # validator.validate(test=args.test, attention=True)
-    # validator.validate_sample(test=args.test, attention=0)
-    # validator.validate_sample(test=args.test, attention=1)
+    validator.validate_all(test=test)
+    validator.validate_sample(test=test)
+    # validator.validate(test=test)
+    if not args.no_attention:
+        print("Use attention!")
+        validator.validate_all(test=test, attention=True)
+        validator.validate(test=test, attention=True)
+        validator.validate_sample(test=test, attention=0)
+        validator.validate_sample(test=test, attention=1)
 
 
