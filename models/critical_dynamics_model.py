@@ -17,7 +17,7 @@ class CriticalDynamicsModel(chainer.Chain):
         super(CriticalDynamicsModel, self).__init__(
             conv1=L.Convolution2D(3, 64, 4, stride=2, nobias=nobias, pad=1),
             conv2=L.Convolution2D(64, 64, 4, stride=2, nobias=nobias, pad=1),
-            conv3=L.Convolution2D(64, 32, 4, stride=1, nobias=nobias, pad=1),
+            conv3=L.Convolution2D(64, 32, 4, stride=2, nobias=nobias, pad=1),
             attention=L.Linear(2, 8192),
             # fc6=L.Linear(25088, 4096),
             fc6=L.Linear(8192, 2),
