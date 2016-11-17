@@ -47,7 +47,6 @@ N = data.N
 TEST_N = data.TEST_N
 
 log_dir = prepare_output_dir(args)
-print("Save at " + log_dir)
 
 # Learning loop
 for epoch in six.moves.range(1, n_epoch + 1):
@@ -90,6 +89,7 @@ for epoch in six.moves.range(1, n_epoch + 1):
         pickle.dump(optimizer, open(log_dir + '/optimizer' + str(epoch) + '.pkl', 'wb'), protocol=2)
 
 # save model.
+print("Save at " + log_dir)
 pickle.dump(model, open(log_dir + '/model.pkl', 'wb'), protocol=2)
 pickle.dump(optimizer, open(log_dir + '/optimizer.pkl', 'wb'), protocol=2)
 plot_scores(log_dir+'/loss.txt')

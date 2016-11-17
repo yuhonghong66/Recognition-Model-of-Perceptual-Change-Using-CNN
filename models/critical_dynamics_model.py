@@ -15,15 +15,20 @@ class CriticalDynamicsModel(chainer.Chain):
     """Input dimensions are (128, 128)."""
     def __init__(self, nobias=True):
         super(CriticalDynamicsModel, self).__init__(
-            conv1=L.Convolution2D(3, 64, 4, stride=2, nobias=nobias, pad=1),
-            conv2=L.Convolution2D(64, 64, 4, stride=2, nobias=nobias, pad=1),
-            conv3=L.Convolution2D(64, 32, 4, stride=2, nobias=nobias, pad=1),
+            conv1_1=L.Convolution2D(3, 64, 3, stride=1, nobias=nobias, pad=1),
+            conv1_2=L.Convolution2D(64, 64, 3, stride=1, nobias=nobias, pad=1),
+            conv2_1=L.Convolution2D(64, 64, 3, stride=1, nobias=nobias, pad=1),
+            conv2_2=L.Convolution2D(64, 64, 3, stride=1, nobias=nobias, pad=1),
+            conv3_1=L.Convolution2D(64, 64, 3, stride=1, nobias=nobias, pad=1),
+            conv3_2=L.Convolution2D(64, 32, 3, stride=1, nobias=nobias, pad=1),
             attention=L.Linear(2, 8192),
             # fc6=L.Linear(25088, 4096),
             fc6=L.Linear(8192, 2),
         )
         self.convs = [
-            ['conv1', 'conv2', 'conv3'],
+            ['conv1_1', 'conv1_2'],
+            ['conv2_1', 'conv2_2'],
+            ['conv3_1', 'conv3_2'],
         ]
 
         self.train = False
@@ -41,10 +46,10 @@ class CriticalDynamicsModel(chainer.Chain):
             for conv in layer:
                 h = F.relu(getattr(self, conv)(h))
 
-            # prepooling_size = h.data.shape[2:]
-            # self.unpooling_outsizes.append(prepooling_size)
-            # h, switches = F.max_pooling_2d(h, 2, stride=2)
-            # self.switches.append(switches)
+            prepooling_size = h.data.shape[2:]
+            self.unpooling_outsizes.append(prepooling_size)
+            h, switches = F.max_pooling_2d(h, 2, stride=2)
+            self.switches.append(switches)
 
             if stop_layer == i + 1:
                 return h
