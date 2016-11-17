@@ -49,47 +49,49 @@ TEST_N = data.TEST_N
 log_dir = prepare_output_dir(args)
 
 # Learning loop
-for epoch in six.moves.range(1, n_epoch + 1):
-    print('epoch', epoch)
+try:
+    for epoch in six.moves.range(1, n_epoch + 1):
+        print('epoch', epoch)
 
-    # training
-    perm = np.random.permutation(N)
-    sum_loss = 0       # total loss
-    for i in six.moves.range(0, N, batchsize):
-        x_batch, t_batch = data.get(perm[i: i+batchsize])
+        # training
+        perm = np.random.permutation(N)
+        sum_loss = 0       # total loss
+        for i in six.moves.range(0, N, batchsize):
+            x_batch, t_batch = data.get(perm[i: i+batchsize])
+            x = chainer.Variable(xp.asarray(x_batch))
+            t = chainer.Variable(xp.asarray(t_batch))
+
+            # model.cleargrads()
+            model.zerograds()
+            loss = model(x, t)
+            loss.backward()
+            optimizer.update()
+
+            sum_loss += float(loss.data) * len(x.data)
+
+        print('train mean loss: {}'.format(sum_loss / N))
+
+        # test
+        x_batch, t_batch = data.get(range(TEST_N), test=True)
         x = chainer.Variable(xp.asarray(x_batch))
         t = chainer.Variable(xp.asarray(t_batch))
 
-        # model.cleargrads()
-        model.zerograds()
         loss = model(x, t)
-        loss.backward()
-        optimizer.update()
-
-        sum_loss += float(loss.data) * len(x.data)
-
-    print('train mean loss: {}'.format(sum_loss / N))
-
-    # test
-    x_batch, t_batch = data.get(range(TEST_N), test=True)
-    x = chainer.Variable(xp.asarray(x_batch))
-    t = chainer.Variable(xp.asarray(t_batch))
-
-    loss = model(x, t)
-    print('test mean loss: {}'.format(float(loss.data)))
-    if not os.path.exists(log_dir+'/loss.txt'):
+        print('test mean loss: {}'.format(float(loss.data)))
+        if not os.path.exists(log_dir+'/loss.txt'):
+            with open(log_dir+'/loss.txt', 'a') as f:
+                f.write('learn_t,train_loss,test_loss\n')
         with open(log_dir+'/loss.txt', 'a') as f:
-            f.write('learn_t,train_loss,test_loss\n')
-    with open(log_dir+'/loss.txt', 'a') as f:
-        f.write(str(epoch) + ',' + str(sum_loss / data.N) + ',' + str(loss.data) + '\n')
+            f.write(str(epoch) + ',' + str(sum_loss / data.N) + ',' + str(loss.data) + '\n')
 
-    if epoch % args.save_turn == 0:
-        print("save model.")
+        if epoch % args.save_turn == 0:
+            print("save model.")
         pickle.dump(model, open(log_dir + '/model' + str(epoch) + '.pkl', 'wb'), protocol=2)
         pickle.dump(optimizer, open(log_dir + '/optimizer' + str(epoch) + '.pkl', 'wb'), protocol=2)
 
 # save model.
-print("Save at " + log_dir)
-pickle.dump(model, open(log_dir + '/model.pkl', 'wb'), protocol=2)
-pickle.dump(optimizer, open(log_dir + '/optimizer.pkl', 'wb'), protocol=2)
-plot_scores(log_dir+'/loss.txt')
+finally:
+    print("Save at " + log_dir)
+    pickle.dump(model, open(log_dir + '/model.pkl', 'wb'), protocol=2)
+    pickle.dump(optimizer, open(log_dir + '/optimizer.pkl', 'wb'), protocol=2)
+    plot_scores(log_dir+'/loss.txt')
