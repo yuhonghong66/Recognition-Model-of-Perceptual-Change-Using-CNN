@@ -47,6 +47,7 @@ N = data.N
 TEST_N = data.TEST_N
 
 log_dir = prepare_output_dir(args)
+print("Save at " + log_dir)
 
 # Learning loop
 for epoch in six.moves.range(1, n_epoch + 1):
