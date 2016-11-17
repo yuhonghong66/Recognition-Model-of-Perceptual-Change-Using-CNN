@@ -77,7 +77,7 @@ class CriticalDynamicsModel(chainer.Chain):
             if stop_layer == i + 1:
                 return h
         shape = h.data.shape
-        h = F.reshape(h, (h.data.shape[0], 1152))
+        h = F.reshape(h, (h.data.shape[0], 8192))
 
         attention = self.attention(a)
 
