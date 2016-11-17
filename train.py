@@ -22,6 +22,7 @@ parser = argparse.ArgumentParser(description='next pred')
 parser.add_argument('--gpu', '-g', default=-1, type=int)
 parser.add_argument('--batchsize', '-b', default=1, type=int)
 parser.add_argument('--epoch', '-e', default=30, type=int)
+parser.add_argument('--save_turn', '-s', default=10, type=int)
 args = parser.parse_args()
 
 # make model.
@@ -82,7 +83,7 @@ for epoch in six.moves.range(1, n_epoch + 1):
     with open(log_dir+'/loss.txt', 'a') as f:
         f.write(str(epoch) + ',' + str(sum_loss / data.N) + ',' + str(loss.data) + '\n')
 
-    if epoch % 5 == 0:
+    if epoch % args.save_turn == 0:
         print("save model.")
         pickle.dump(model, open(log_dir + '/model' + str(epoch) + '.pkl', 'wb'), protocol=2)
         pickle.dump(optimizer, open(log_dir + '/optimizer' + str(epoch) + '.pkl', 'wb'), protocol=2)
