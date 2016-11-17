@@ -79,7 +79,7 @@ class CriticalDynamicsModel(chainer.Chain):
         shape = h.data.shape
         h = F.reshape(h, (h.data.shape[0], 8192))
 
-        attention = self.attention(a)
+        attention = F.sigmoid(self.attention(a))
 
         h = attention * h
         if stop_layer == 'attention':
