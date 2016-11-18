@@ -21,9 +21,8 @@ class CriticalDynamicsModel(chainer.Chain):
             conv2_2=L.Convolution2D(64, 64, 3, stride=1, nobias=nobias, pad=1),
             conv3_1=L.Convolution2D(64, 64, 3, stride=1, nobias=nobias, pad=1),
             conv3_2=L.Convolution2D(64, 32, 3, stride=1, nobias=nobias, pad=1),
-            attention=L.Linear(2, 8192),
-            # fc6=L.Linear(25088, 4096),
-            fc6=L.Linear(8192, 2),
+            attention=L.Linear(2, 16384),
+            fc6=L.Linear(16384, 2),
         )
         self.convs = [
             ['conv1_1', 'conv1_2'],
@@ -114,6 +113,7 @@ class CriticalDynamicsModel(chainer.Chain):
         self.add_deconv_layers()
         # Forward pass
         h = self.forward_with_attention(x, a, stop_layer='attention')
+        # h = self.forward_with_attention(x, a, stop_layer=3)
         xp = chainer.cuda.get_array_module(h.data)
         layer = len(self.convs)
         deconvs = [['de{}'.format(c) for c in conv] for conv in self.convs]
