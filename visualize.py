@@ -4,7 +4,7 @@ import numpy as np
 import cv2 as cv
 from chainer import serializers
 from chainer import Variable
-from models.VGG import VGG
+from models.critical_dynamics_model import CriticalDynamicsModel
 from utils import imgutil
 try:
     import cPickle as pickle
@@ -115,7 +115,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     print('Preparing the model...')
-    model = pickle.load(open(args.model,'r'))
+    # make model.
+    print(args.model)
+    model = CriticalDynamicsModel()
+    serializers.load_npz(args.model, model)
+    if not model._cpu:
+        model.to_cpu()
     model.train = False
     model_name = args.model.split('/')[-1]
     outdir = args.model.rstrip(model_name) + 'activations'

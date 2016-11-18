@@ -121,7 +121,7 @@ class CriticalDynamicsModel(chainer.Chain):
         feat_maps = []
 
         for i, deconv in enumerate(reversed(deconvs)):
-            h = F.unpooling_2d(h, self.switches[layer-i-1], 2, stride=2,
+            h = unpooling_2d.unpooling_2d(h, self.switches[layer-i-1], 2, stride=2,
                                outsize=self.unpooling_outsizes[layer-i-1])
             for d in reversed(deconv):
                 h = getattr(self, d)(F.relu(h))
@@ -160,7 +160,7 @@ class CriticalDynamicsModel(chainer.Chain):
             h = Variable(xp.where(condition, h_data, zeros))
 
             for i, deconv in enumerate(reversed(deconvs)):
-                h = F.unpooling_2d(h, self.switches[layer-i-1], 2, stride=2,
+                h = unpooling_2d.unpooling_2d(h, self.switches[layer-i-1], 2, stride=2,
                                    outsize=self.unpooling_outsizes[layer-i-1])
                 for d in reversed(deconv):
                     h = getattr(self, d)(F.relu(h))

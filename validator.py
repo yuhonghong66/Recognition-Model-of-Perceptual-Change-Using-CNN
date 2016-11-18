@@ -11,6 +11,8 @@ try:
 except:
     import pickle
 import chainer
+from chainer import serializers
+from models.critical_dynamics_model import CriticalDynamicsModel
 from chainer import cuda
 
 from utils.ML.data import Data
@@ -118,7 +120,8 @@ if __name__ == '__main__':
 
     # make model.
     print(args.model)
-    model = pickle.load(open(args.model, 'r'))
+    model = CriticalDynamicsModel()
+    serializers.load_npz(args.model, model)
     if not model._cpu:
         model.to_cpu()
     model.train = False

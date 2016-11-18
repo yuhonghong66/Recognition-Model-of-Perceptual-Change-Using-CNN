@@ -10,6 +10,7 @@ except:
 import chainer
 from chainer import cuda
 from chainer import optimizers
+from chainer import serializers
 from utils.ML.data import Data
 from models.critical_dynamics_model import CriticalDynamicsModel
 from utils.prepare_output_dir import prepare_output_dir
@@ -20,7 +21,7 @@ os.environ['PATH'] += ':/usr/local/cuda-7.5/bin'
 # parse args
 parser = argparse.ArgumentParser(description='next pred')
 parser.add_argument('--gpu', '-g', default=-1, type=int)
-parser.add_argument('--batchsize', '-b', default=1, type=int)
+parser.add_argument('--batchsize', '-b', default=30, type=int)
 parser.add_argument('--epoch', '-e', default=30, type=int)
 parser.add_argument('--save_turn', '-s', default=10, type=int)
 args = parser.parse_args()
@@ -89,8 +90,10 @@ try:
             use_cpu = model._cpu
             if not use_cpu:
                 model.to_cpu()
-            pickle.dump(model, open(log_dir + '/model' + str(epoch) + '.pkl', 'wb'), protocol=2)
-            pickle.dump(optimizer, open(log_dir + '/optimizer' + str(epoch) + '.pkl', 'wb'), protocol=2)
+            # pickle.dump(model, open(log_dir + '/model' + str(epoch) + '.pkl', 'wb'), protocol=2)
+            # pickle.dump(optimizer, open(log_dir + '/optimizer' + str(epoch) + '.pkl', 'wb'), protocol=2)
+            serializers.save_npz(log_dir + '/model' + str(epoch) + '.pkl', model)
+            serializers.save_npz(log_dir + '/optimizer' + str(epoch) + '.pkl', optimizer)
             if not use_cpu:
                 model.to_gpu()
 
@@ -98,6 +101,8 @@ try:
 finally:
     print("Save at " + log_dir)
     model.to_cpu()
-    pickle.dump(model, open(log_dir + '/model.pkl', 'wb'), protocol=2)
-    pickle.dump(optimizer, open(log_dir + '/optimizer.pkl', 'wb'), protocol=2)
+    serializers.save_npz(log_dir + '/model.npz', model)
+    serializers.save_npz(log_dir + '/optimizer.npz', optimizer)
+    # pickle.dump(model, open(log_dir + '/model.pkl', 'wb'), protocol=2)
+    # pickle.dump(optimizer, open(log_dir + '/optimizer.pkl', 'wb'), protocol=2)
     plot_scores(log_dir+'/loss.txt')
