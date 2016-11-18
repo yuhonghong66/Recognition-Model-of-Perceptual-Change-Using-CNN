@@ -127,9 +127,9 @@ if __name__ == '__main__':
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 
-    # # Visualize each of the 5 convolutional layers in VGG
-    # for layer in range(2)
-    #     save_activations(model, sample_im(), layer, outdir)
+    # Visualize each of the 5 convolutional layers in VGG
+    for layer in range(2):
+        save_activations(model, sample_im(), layer, outdir)
     # save_activations(model, sample_im(), 0, outdir)
 
     save_activations_with_attention(model, sample_im(), outdir)

@@ -11,6 +11,7 @@ import chainer
 from chainer import cuda
 from chainer import optimizers
 from chainer import serializers
+from models.critical_dynamics_model import CriticalDynamicsModel
 from utils.ML.data import Data
 from utils.prepare_output_dir import prepare_output_dir
 from utils.plot_scores import plot_scores
@@ -28,10 +29,12 @@ args = parser.parse_args()
 
 # make model.
 print(args.model)
-model = pickle.load(open(args.model, 'r'))
+model = CriticalDynamicsModel()
+serializers.load_npz(args.model, model)
 if not model._cpu:
     model.to_cpu()
 model.train = True
+
 optimizer = optimizers.Adam()
 # optimizer.use_cleargrads()
 optimizer.setup(model.attention)
