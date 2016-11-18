@@ -7,8 +7,8 @@ from lib.chainer.chainer.functions.pooling import max_pooling_2d
 from lib.chainer.chainer.functions.pooling import unpooling_2d
 
 # Override original Chainer functions
-F.max_pooling_2d = max_pooling_2d.max_pooling_2d
-F.unpooling_2d = unpooling_2d.unpooling_2d
+# F.max_pooling_2d = max_pooling_2d.max_pooling_2d
+# F.unpooling_2d = unpooling_2d.unpooling_2d
 
 
 class CriticalDynamicsModel(chainer.Chain):
@@ -46,10 +46,13 @@ class CriticalDynamicsModel(chainer.Chain):
             for conv in layer:
                 h = F.relu(getattr(self, conv)(h))
 
-            prepooling_size = h.data.shape[2:]
-            self.unpooling_outsizes.append(prepooling_size)
-            h, switches = F.max_pooling_2d(h, 2, stride=2)
-            self.switches.append(switches)
+            if self.train:
+                h = F.max_pooling_2d(h, 2, stride=2)
+            else:
+                prepooling_size = h.data.shape[2:]
+                self.unpooling_outsizes.append(prepooling_size)
+                h, switches = max_pooling_2d.max_pooling_2d(h, 2, stride=2)
+                self.switches.append(switches)
 
             if stop_layer == i + 1:
                 return h
@@ -74,13 +77,17 @@ class CriticalDynamicsModel(chainer.Chain):
             for conv in layer:
                 h = F.relu(getattr(self, conv)(h))
 
-            prepooling_size = h.data.shape[2:]
-            self.unpooling_outsizes.append(prepooling_size)
-            h, switches = F.max_pooling_2d(h, 2, stride=2)
-            self.switches.append(switches)
+            if self.train:
+                h = F.max_pooling_2d(h, 2, stride=2)
+            else:
+                prepooling_size = h.data.shape[2:]
+                self.unpooling_outsizes.append(prepooling_size)
+                h, switches = max_pooling_2d.max_pooling_2d(h, 2, stride=2)
+                self.switches.append(switches)
 
             if stop_layer == i + 1:
                 return h
+
         shape = h.data.shape
         h = F.reshape(h, (h.data.shape[0], 8192))
 

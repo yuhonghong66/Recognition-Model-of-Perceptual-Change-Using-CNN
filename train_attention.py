@@ -30,6 +30,7 @@ print(args.model)
 model = pickle.load(open(args.model, 'r'))
 if not model._cpu:
     model.to_cpu()
+model.train = True
 optimizer = optimizers.Adam()
 # optimizer.use_cleargrads()
 optimizer.setup(model.attention)

@@ -116,6 +116,7 @@ if __name__ == '__main__':
 
     print('Preparing the model...')
     model = pickle.load(open(args.model,'r'))
+    model.train = False
     model_name = args.model.split('/')[-1]
     outdir = args.model.rstrip(model_name) + 'activations'
     if not os.path.exists(outdir):
