@@ -86,13 +86,13 @@ try:
 
         if epoch % args.save_turn == 0:
             print("save model.")
-        use_cpu = model._cpu
-        if not use_cpu:
-            model.to_cpu()
-        pickle.dump(model, open(log_dir + '/model' + str(epoch) + '.pkl', 'wb'), protocol=2)
-        pickle.dump(optimizer, open(log_dir + '/optimizer' + str(epoch) + '.pkl', 'wb'), protocol=2)
-        if not use_cpu:
-            model.to_gpu()
+            use_cpu = model._cpu
+            if not use_cpu:
+                model.to_cpu()
+            pickle.dump(model, open(log_dir + '/model' + str(epoch) + '.pkl', 'wb'), protocol=2)
+            pickle.dump(optimizer, open(log_dir + '/optimizer' + str(epoch) + '.pkl', 'wb'), protocol=2)
+            if not use_cpu:
+                model.to_gpu()
 
 # save model.
 finally:
