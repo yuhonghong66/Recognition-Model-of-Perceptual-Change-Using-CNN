@@ -98,6 +98,9 @@ try:
                 model.to_gpu()
 
 # save model.
+except Exception as e:
+    print(e)
+
 finally:
     print("Save at " + log_dir)
     model.to_cpu()
