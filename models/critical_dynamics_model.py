@@ -20,7 +20,7 @@ class CriticalDynamicsModel(chainer.Chain):
             conv2_1=L.Convolution2D(64, 64, 3, stride=1, nobias=nobias, pad=1),
             conv2_2=L.Convolution2D(64, 64, 3, stride=1, nobias=nobias, pad=1),
             conv3_1=L.Convolution2D(64, 64, 3, stride=1, nobias=nobias, pad=1),
-            conv3_2=L.Convolution2D(64, 32, 3, stride=1, nobias=nobias, pad=1),
+            conv3_2=L.Convolution2D(64, 64, 3, stride=1, nobias=nobias, pad=1),
             conv4_1=L.Convolution2D(64, 64, 3, stride=1, nobias=nobias, pad=1),
             conv4_2=L.Convolution2D(64, 32, 3, stride=1, nobias=nobias, pad=1),
             attention=L.Linear(2, 8192),
