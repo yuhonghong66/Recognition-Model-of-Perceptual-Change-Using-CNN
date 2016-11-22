@@ -12,7 +12,6 @@ from lib.chainer.chainer.functions.pooling import unpooling_2d
 
 
 class CriticalDynamicsModel(chainer.Chain):
-    """Input dimensions are (128, 128)."""
     def __init__(self, nobias=True):
         super(CriticalDynamicsModel, self).__init__(
             conv1_1=L.Convolution2D(3, 64, 3, stride=1, nobias=nobias, pad=1),
@@ -20,11 +19,11 @@ class CriticalDynamicsModel(chainer.Chain):
             conv2_1=L.Convolution2D(64, 64, 3, stride=1, nobias=nobias, pad=1),
             conv2_2=L.Convolution2D(64, 64, 3, stride=1, nobias=nobias, pad=1),
             conv3_1=L.Convolution2D(64, 64, 3, stride=1, nobias=nobias, pad=1),
-            conv3_2=L.Convolution2D(64, 64, 3, stride=1, nobias=nobias, pad=1),
-            conv4_1=L.Convolution2D(64, 64, 3, stride=1, nobias=nobias, pad=1),
-            conv4_2=L.Convolution2D(64, 32, 3, stride=1, nobias=nobias, pad=1),
-            attention=L.Linear(2, 8192),
-            fc6=L.Linear(8192, 2),
+            conv3_2=L.Convolution2D(64, 32, 3, stride=1, nobias=nobias, pad=1),
+            conv4_1=L.Convolution2D(32, 32, 3, stride=1, nobias=nobias, pad=1),
+            conv4_2=L.Convolution2D(32, 32, 3, stride=1, nobias=nobias, pad=1),
+            attention=L.Linear(2, 32768),
+            fc6=L.Linear(32768, 2),
         )
         self.convs = [
             ['conv1_1', 'conv1_2'],
@@ -37,7 +36,7 @@ class CriticalDynamicsModel(chainer.Chain):
         self.added_deconv = False
         self.unpooling_outsizes = []
         self.added_deconv = False
-        self.attention_layer = 2
+        self.attention_layer = 3
 
     def __call__(self, x, t=None, stop_layer=None):
         self.switches = []
@@ -93,7 +92,7 @@ class CriticalDynamicsModel(chainer.Chain):
 
             if i + 1 == self.attention_layer:
                 shape = h.data.shape
-                h = F.reshape(h, (h.data.shape[0], 8192))
+                h = F.reshape(h, (h.data.shape[0], 32768))
                 attention = F.sigmoid(self.attention(a))
                 h = attention * h
                 h = F.reshape(h, shape)
