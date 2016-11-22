@@ -13,10 +13,9 @@ except:
 import chainer
 from chainer import serializers
 from models.critical_dynamics_model import CriticalDynamicsModel
-from chainer import cuda
 
-from utils.ML.data import Data
 from utils import imgutil
+from utils.ML.data import Data
 
 os.environ['PATH'] += ':/usr/local/cuda-7.5/bin'
 
@@ -84,7 +83,7 @@ class Validator(object):
 
     def validate_sample(self, test=True, attention=None):
         print("sample image!")
-        x = chainer.Variable(sample_im())
+        x = chainer.Variable(sample_im(size=self.data.insize))
         if attention in [0, 1]:
             print(attention)
             t_batch = [[attention]]
@@ -98,12 +97,12 @@ class Validator(object):
         print(pred_t)
 
 
-def sample_im():
+def sample_im(size=256):
     """Return a preprocessed (averaged and resized to VGG) sample image."""
     # mean = np.array([103.939, 116.779, 123.68])
     im = cv.imread('images/double.jpg').astype(np.float32)
     # im -= mean
-    im = cv.resize(im, (128, 128)).transpose((2, 0, 1))
+    im = cv.resize(im, (size, size)).transpose((2, 0, 1))
     im = im[np.newaxis, :, :, :] / 255.0
     return im
 

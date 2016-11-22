@@ -10,7 +10,7 @@ try:
     import cPickle as pickle
 except:
     import pickle
-
+from utils.ML.data import Data
 
 """
 TODO
@@ -19,12 +19,12 @@ TODO
 """
 
 
-def sample_im():
+def sample_im(size=256):
     """Return a preprocessed (averaged and resized to VGG) sample image."""
     # mean = np.array([103.939, 116.779, 123.68])
-    im = cv.imread('images/double.jpg').astype(np.float32)
+    im = cv.imread('images/bill.jpg').astype(np.float32)
     # im -= mean
-    im = cv.resize(im, (128, 128)).transpose((2, 0, 1))
+    im = cv.resize(im, (size, size)).transpose((2, 0, 1))
     im = im[np.newaxis, :, :, :] / 255.0
     return im
 
@@ -128,9 +128,9 @@ if __name__ == '__main__':
         os.makedirs(outdir)
 
     # Visualize each of the 5 convolutional layers in VGG
-    for layer in range(2):
-        save_activations(model, sample_im(), layer, outdir)
-    # save_activations(model, sample_im(), 0, outdir)
+    # for layer in range(len(model.convs)):
+    #     save_activations(model, sample_im(), layer, outdir)
 
-    save_activations_with_attention(model, sample_im(), outdir)
+    size = Data().insize
+    save_activations_with_attention(model, sample_im(size=size), outdir)
     print('Done')
