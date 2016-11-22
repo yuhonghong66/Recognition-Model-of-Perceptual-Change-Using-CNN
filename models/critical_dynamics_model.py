@@ -37,6 +37,7 @@ class CriticalDynamicsModel(chainer.Chain):
         self.added_deconv = False
         self.unpooling_outsizes = []
         self.added_deconv = False
+        self.attention_layer = 2
 
     def __call__(self, x, t=None, stop_layer=None):
         self.switches = []
@@ -90,15 +91,14 @@ class CriticalDynamicsModel(chainer.Chain):
             if stop_layer == i + 1:
                 return h
 
-        shape = h.data.shape
-        h = F.reshape(h, (h.data.shape[0], 8192))
-
-        attention = F.sigmoid(self.attention(a))
-
-        h = attention * h
-        if stop_layer == 'attention':
-            h = F.reshape(h, shape)
-            return h
+            if i + 1 == self.attention_layer:
+                shape = h.data.shape
+                h = F.reshape(h, (h.data.shape[0], 8192))
+                attention = F.sigmoid(self.attention(a))
+                h = attention * h
+                h = F.reshape(h, shape)
+                if stop_layer == 'attention':
+                    return h
 
         h = self.fc6(h)
         if self.train:
@@ -115,11 +115,13 @@ class CriticalDynamicsModel(chainer.Chain):
                             image at a time')
         self.add_deconv_layers()
         # Forward pass
-        h = self.forward_with_attention(x, a, stop_layer='attention')
-        # h = self.forward_with_attention(x, a, stop_layer=3)
+        # h = self.forward_with_attention(x, a, stop_layer='attention')
+        h = self.forward_with_attention(x, a, stop_layer=2)
         xp = chainer.cuda.get_array_module(h.data)
-        layer = len(self.convs)
-        deconvs = [['de{}'.format(c) for c in conv] for conv in self.convs]
+        # layer = len(self.convs)
+        layer = self.attention_layer
+        convs = self.convs[:layer]
+        deconvs = [['de{}'.format(c) for c in conv] for conv in convs]
 
         feat_maps = []
 
