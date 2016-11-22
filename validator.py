@@ -135,7 +135,7 @@ if __name__ == '__main__':
     if not args.no_attention:
         print("Use attention!")
         validator.validate_all(test=test, attention=True)
-        validator.validate(test=test, attention=True)
+        # validator.validate(test=test, attention=True)
         validator.validate_sample(test=test, attention=0)
         validator.validate_sample(test=test, attention=1)
 

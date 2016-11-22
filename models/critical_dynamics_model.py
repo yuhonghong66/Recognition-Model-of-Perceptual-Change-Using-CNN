@@ -114,11 +114,12 @@ class CriticalDynamicsModel(chainer.Chain):
                             image at a time')
         self.add_deconv_layers()
         # Forward pass
-        # h = self.forward_with_attention(x, a, stop_layer='attention')
-        h = self.forward_with_attention(x, a, stop_layer=2)
+        h = self.forward_with_attention(x, a, stop_layer='attention')
+        # h = self.forward_with_attention(x, a, stop_layer=3)
         xp = chainer.cuda.get_array_module(h.data)
         # layer = len(self.convs)
         layer = self.attention_layer
+        # layer = 3
         convs = self.convs[:layer]
         deconvs = [['de{}'.format(c) for c in conv] for conv in convs]
 
