@@ -37,7 +37,7 @@ def get_activations(model, x, layer, a=None):
     if layer == 'attention':
         a = model.activate_with_attention(Variable(x), Variable(a))  # To 1-indexed
     else:
-        a = model.activations(Variable(x), layer=layer+1)  # To 1-indexed
+        a = model.activations(Variable(x), layer=layer)  # To 1-indexed
     a = a.data[0]  # Assume batch with a single image
     a = post_process_activations(a)
     # a = [post_process_activations(_a) for _a in a]
@@ -84,12 +84,12 @@ def save_activations(model, x, layer, dst_root):
     """Save feature map activations for the given image as images on disk."""
 
     # Create the target directory if it doesn't already exist
-    dst_dir = os.path.join(dst_root, 'layer_{}/'.format(layer+1))
+    dst_dir = os.path.join(dst_root, 'layer_{}/'.format(layer))
     dst_dir = os.path.dirname(dst_dir)
     if not os.path.exists(dst_dir):
         os.makedirs(dst_dir)
 
-    print('Computing activations for layer {}...'.format(layer+1))
+    print('Computing activations for layer {}...'.format(layer))
     activations = get_activations(model, x, layer)
 
     # Save each activation as its own image to later tile them all into
@@ -104,7 +104,7 @@ def save_activations(model, x, layer, dst_root):
         print('Saving image {}...'.format(filename))
         imgutil.save_im(filename, im)
 
-    tiled_filename = os.path.join(dst_root, 'layer_{}.jpg'.format(layer+1))
+    tiled_filename = os.path.join(dst_root, 'layer_{}.jpg'.format(layer))
     print('Saving image {}...'.format(filename))
     imgutil.tile_ims(tiled_filename, dst_dir)
 
@@ -128,8 +128,9 @@ if __name__ == '__main__':
         os.makedirs(outdir)
 
     # Visualize each of the 5 convolutional layers in VGG
-    # for layer in range(len(model.convs)):
-    #     save_activations(model, sample_im(), layer, outdir)
+    # for i in range(len(model.convs)):
+    #     save_activations(model, sample_im(), i + 1, outdir)
+    save_activations(model, sample_im(), 3, outdir)
 
     size = Data().insize
     save_activations_with_attention(model, sample_im(size=size), outdir)
