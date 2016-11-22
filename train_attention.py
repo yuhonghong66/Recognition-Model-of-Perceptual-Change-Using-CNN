@@ -106,6 +106,9 @@ try:
             if not use_cpu:
                 model.to_gpu()
 
+except Exception as e:
+    print(e)
+
 # save model.
 finally:
     print("Save at " + log_dir)
