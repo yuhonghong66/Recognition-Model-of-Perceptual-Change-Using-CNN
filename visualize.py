@@ -5,6 +5,7 @@ import cv2 as cv
 from chainer import serializers
 from chainer import Variable
 from models.critical_dynamics_model import CriticalDynamicsModel
+from models.VGG import VGG
 from utils import imgutil
 try:
     import cPickle as pickle
@@ -111,27 +112,33 @@ def save_activations(model, x, layer, dst_root):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='next pred')
-    parser.add_argument('model', type=str)
+    parser.add_argument('--model', type=str, default=None)
     args = parser.parse_args()
 
     print('Preparing the model...')
-    # make model.
-    print(args.model)
-    model = CriticalDynamicsModel()
-    serializers.load_npz(args.model, model)
+    if args.model is not None:
+        print(args.model)
+        model = CriticalDynamicsModel()
+        serializers.load_npz(args.model, model)
+        model_name = args.model.split('/')[-1]
+        outdir = args.model.rstrip(model_name) + 'activations'
+        if not os.path.exists(outdir):
+            os.makedirs(outdir)
+    else:
+        model = VGG()
+        serializers.load_hdf5('VGG.model', model)
+        outdir = 'activations'
+        if not os.path.exists(outdir):
+            os.makedirs(outdir)
+
     if not model._cpu:
         model.to_cpu()
     model.train = False
-    model_name = args.model.split('/')[-1]
-    outdir = args.model.rstrip(model_name) + 'activations'
-    if not os.path.exists(outdir):
-        os.makedirs(outdir)
-
-    # Visualize each of the 5 convolutional layers in VGG
-    # for i in range(len(model.convs)):
-    #     save_activations(model, sample_im(), i + 1, outdir)
-    save_activations(model, sample_im(), 3, outdir)
 
     size = Data().insize
-    save_activations_with_attention(model, sample_im(size=size), outdir)
+    # Visualize each of the 5 convolutional layers in VGG
+    for i in range(len(model.convs)):
+        save_activations(model, sample_im(size=size), i + 1, outdir)
+
+    # save_activations_with_attention(model, sample_im(size=size), outdir)
     print('Done')
