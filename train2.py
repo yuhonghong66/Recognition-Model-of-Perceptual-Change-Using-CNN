@@ -100,7 +100,7 @@ try:
             if not use_cpu:
                 attention_model.to_cpu()
             serializers.save_npz(log_dir + '/attention_model' + str(epoch) + '.npz', attention_model)
-            serializers.save_npz(log_dir + '/optimizer' + str(epoch) + '.npz', optimizer)
+            # serializers.save_npz(log_dir + '/optimizer' + str(epoch) + '.npz', optimizer)
             if not use_cpu:
                 attention_model.to_gpu()
 
@@ -112,5 +112,5 @@ finally:
     print("Save at " + log_dir)
     attention_model.to_cpu()
     serializers.save_npz(log_dir + '/attention_model.npz', attention_model)
-    serializers.save_npz(log_dir + '/optimizer.npz', optimizer)
+    # serializers.save_npz(log_dir + '/optimizer.npz', optimizer)
     plot_scores(log_dir+'/loss.txt')

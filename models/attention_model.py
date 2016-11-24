@@ -14,7 +14,6 @@ class AttentionModel(chainer.Chain):
             fc8=L.Linear(4096, 2),
             attention=L.Linear(2, 512)
         )
-
         self.train = False
 
     def __call__(self, fm, t=None):
@@ -39,6 +38,9 @@ class AttentionModel(chainer.Chain):
         fm = fm * attention
         return fm
 
-    def forward_with_attention(self, fm, a, t):
+    def forward_with_attention(self, fm, a, t=None):
         fm = self.give_attention(fm, a)
-        return self(fm, t)
+        if self.train:
+            return self(fm, t)
+        else:
+            return self(fm)

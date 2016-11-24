@@ -104,10 +104,8 @@ try:
             use_cpu = attention_model._cpu
             if not use_cpu:
                 attention_model.to_cpu()
-            # pickle.dump(model, open(log_dir + '/model' + str(epoch) + '.pkl', 'wb'), protocol=2)
-            # pickle.dump(optimizer, open(log_dir + '/optimizer' + str(epoch) + '.pkl', 'wb'), protocol=2)
             serializers.save_npz(log_dir + '/model' + str(epoch) + '.npz', attention_model)
-            serializers.save_npz(log_dir + '/optimizer' + str(epoch) + '.npz', optimizer)
+            # serializers.save_npz(log_dir + '/optimizer' + str(epoch) + '.npz', optimizer)
             if not use_cpu:
                 attention_model.to_gpu()
 
@@ -119,8 +117,6 @@ finally:
     print("Save at " + log_dir)
     if not attention_model._cpu:
         attention_model.to_cpu()
-    # pickle.dump(model, open(log_dir + '/model.pkl', 'wb'), protocol=2)
-    # pickle.dump(optimizer, open(log_dir + '/optimizer.pkl', 'wb'), protocol=2)
     serializers.save_npz(log_dir + '/model.npz', attention_model)
-    serializers.save_npz(log_dir + '/optimizer.npz', optimizer)
+    # serializers.save_npz(log_dir + '/optimizer.npz', optimizer)
     plot_scores(log_dir+'/loss.txt')
