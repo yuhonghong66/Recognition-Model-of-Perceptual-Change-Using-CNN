@@ -77,8 +77,8 @@ class Visualizer(object):
             activations = self.model.activations(x, layer=layer)
 
         activations = activations.data[0]
-        # activations = post_process_activations(activations)
-        activations = post_process_activations_simple(activations)
+        activations = post_process_activations(activations)
+        # activations = post_process_activations_simple(activations)
         # activations = [post_process_activations(_a) for _a in activations]
         # activations = [post_process_activations_simple(_a) for _a in activations]
         return activations
@@ -119,23 +119,23 @@ class Visualizer(object):
                 fm = self.attention_model.give_attention(fm, attention)
                 activations = self.model.activate_by_feature(fm, layer=layer)
                 activations = activations.data[0]
-                # activations = post_process_activations(activations)
+                activations = post_process_activations(activations)
                 # activations = post_process_activations_simple(activations)
-                activations = [post_process_activations_simple(_a) for _a in activations]
+                # activations = [post_process_activations_simple(_a) for _a in activations]
                 save_im(activations, outdir + '/all_feature' + str(idx) + '.jpg')
         else:
             fm = self.model(x, stop_layer=layer)
             activations = self.model.activate_by_feature(fm, layer=layer)
             activations = activations.data[0]
-            # activations = post_process_activations(activations)
+            activations = post_process_activations(activations)
             # activations = post_process_activations_simple(activations)
-            activations = [post_process_activations_simple(_a) for _a in activations]
+            # activations = [post_process_activations_simple(_a) for _a in activations]
             save_im(activations, outdir + '/all_feature.jpg')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='next pred')
-    parser.add_argument('--model', type=str, default=None)
+    parser.add_argument('model', type=str, default=None)
     args = parser.parse_args()
 
     print('Preparing the model...')
