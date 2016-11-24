@@ -32,7 +32,11 @@ class AttentionModel(chainer.Chain):
 
     def give_attention(self, fm, a):
         attention = self.attention(a)
-        # TODO: hoge
+        shape_attention = attention.data.shape + (1, 1)
+        attention = F.reshape(attention, shape_attention)
+        shape_tile = (1, 1) + fm.data.shape[2:]
+        attention = F.tile(attention, shape_tile)
+        fm = fm * attention
         return fm
 
     def forward_with_attention(self, fm, a, t):

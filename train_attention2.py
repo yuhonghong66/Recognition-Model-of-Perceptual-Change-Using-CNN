@@ -106,8 +106,8 @@ try:
                 attention_model.to_cpu()
             # pickle.dump(model, open(log_dir + '/model' + str(epoch) + '.pkl', 'wb'), protocol=2)
             # pickle.dump(optimizer, open(log_dir + '/optimizer' + str(epoch) + '.pkl', 'wb'), protocol=2)
-            serializers.save_npz(log_dir + '/model' + str(epoch) + '.pkl', attention_model)
-            serializers.save_npz(log_dir + '/optimizer' + str(epoch) + '.pkl', optimizer)
+            serializers.save_npz(log_dir + '/model' + str(epoch) + '.npz', attention_model)
+            serializers.save_npz(log_dir + '/optimizer' + str(epoch) + '.npz', optimizer)
             if not use_cpu:
                 attention_model.to_gpu()
 

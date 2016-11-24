@@ -99,8 +99,8 @@ try:
             use_cpu = attention_model._cpu
             if not use_cpu:
                 attention_model.to_cpu()
-            serializers.save_npz(log_dir + '/attention_model' + str(epoch) + '.pkl', attention_model)
-            serializers.save_npz(log_dir + '/optimizer' + str(epoch) + '.pkl', optimizer)
+            serializers.save_npz(log_dir + '/attention_model' + str(epoch) + '.npz', attention_model)
+            serializers.save_npz(log_dir + '/optimizer' + str(epoch) + '.npz', optimizer)
             if not use_cpu:
                 attention_model.to_gpu()
 
