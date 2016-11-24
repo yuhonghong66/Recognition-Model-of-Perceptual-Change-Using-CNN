@@ -79,6 +79,33 @@ class VGG(chainer.Chain):
             self.pred = F.softmax(h)
             return self.pred
 
+    def activate_by_feature(self, fm, layer):
+        if fm.data.shape[0] != 1:
+            raise TypeError('Visualization is only supported for a single \
+                            image at a time')
+
+        self.add_deconv_layers()
+
+        # Compute the activations for each feature map
+        xp = chainer.cuda.get_array_module(fm.data)
+        convs = self.convs[:layer]
+        deconvs = [['de{}'.format(c) for c in conv] for conv in convs]
+
+        feat_maps = []
+
+        h = fm
+        for i, deconv in enumerate(reversed(deconvs)):
+            h = F.unpooling_2d(h, self.switches[layer-i-1], 2, stride=2,
+                              outsize=self.unpooling_outsizes[layer-i-1])
+            for d in reversed(deconv):
+                h = getattr(self, d)(F.relu(h))
+
+        feat_maps.append(h.data)
+        feat_maps = xp.array(feat_maps)
+        feat_maps = xp.rollaxis(feat_maps, 0, 2)  # Batch to first axis
+
+        return Variable(feat_maps)
+
     def activations(self, x, layer):
         if x.data.shape[0] != 1:
             raise TypeError('Visualization is only supported for a single \
