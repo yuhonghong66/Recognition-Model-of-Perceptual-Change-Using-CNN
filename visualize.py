@@ -149,6 +149,6 @@ if __name__ == '__main__':
     #     save_activations(model, sample_im(size=224), i + 1, outdir)
 
     # save_activations_with_attention(model, sample_im(size=size), outdir)
-    activation = get_activations(model, sample_im(244), layer=5, all_feature=True)
+    activation = get_activations(model, sample_im(224), layer=5, all_feature=True)
     save_im(activation, outdir + '/all_feature.jpg')
     print('Done')
