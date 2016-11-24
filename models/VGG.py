@@ -163,5 +163,4 @@ class VGG(chainer.Chain):
                                            initialW=layer.W.data,
                                            nobias=nobias)
                 self.add_link('de{}'.format(layer.name), deconv)
-
         self.added_deconv = True

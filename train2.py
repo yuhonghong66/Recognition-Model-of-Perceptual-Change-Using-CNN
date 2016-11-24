@@ -12,7 +12,6 @@ from chainer import cuda
 from chainer import optimizers
 from chainer import serializers
 from utils.ML.data import Data
-from models.critical_dynamics_model import CriticalDynamicsModel
 from models.attention_model import AttentionModel
 from models.VGG import VGG
 from utils.prepare_output_dir import prepare_output_dir

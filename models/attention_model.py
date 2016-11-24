@@ -11,8 +11,8 @@ class AttentionModel(chainer.Chain):
         super(AttentionModel, self).__init__(
             fc6=L.Linear(25088, 4096),
             fc7=L.Linear(4096, 4096),
-            fc8=L.Linear(4096, 2)
-            # TODO: make attention
+            fc8=L.Linear(4096, 2),
+            attention=L.Linear(2, 512)
         )
 
         self.train = False
@@ -31,5 +31,10 @@ class AttentionModel(chainer.Chain):
             return self.pred
 
     def give_attention(self, fm, a):
-        # TODO: give attentioggtfrr
-        pass
+        attention = self.attention(a)
+        # TODO: hoge
+        return fm
+
+    def forward_with_attention(self, fm, a, t):
+        fm = self.give_attention(fm, a)
+        return self(fm, t)
