@@ -97,9 +97,9 @@ try:
 
         if epoch % args.save_turn == 0:
             print("save model.")
-            use_cpu = model._cpu
+            use_cpu = attention_model._cpu
             if not use_cpu:
-                model.to_cpu()
+                attention_model.to_cpu()
             serializers.save_npz(log_dir + '/attention_model' + str(epoch) + '.pkl', attention_model)
             serializers.save_npz(log_dir + '/optimizer' + str(epoch) + '.pkl', optimizer)
             if not use_cpu:
