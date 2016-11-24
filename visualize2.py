@@ -4,7 +4,6 @@ import numpy as np
 import cv2 as cv
 from chainer import serializers
 from chainer import Variable
-from models.critical_dynamics_model import CriticalDynamicsModel
 from models.attention_model import AttentionModel
 from models.VGG import VGG
 from utils import imgutil
@@ -54,7 +53,16 @@ def post_process_activations(a):
     return a
 
 
-class Visalizer(object):
+def post_process_activations_simple(a):
+    a -= a.min()
+    if a.max() > 0:
+        a *= 255.0 / a.max()
+    else:
+        a *= 255.0
+    return a
+
+
+class Visualizer(object):
     def __init__(self, model, attention_model=None):
         self.model = model
         self.attention_model = attention_model
@@ -66,11 +74,13 @@ class Visalizer(object):
                 fm = self.attention_model.give_attention(fm, a)
             activations = self.model.activate_by_feature(fm, layer=layer)
         else:
-            pass
+            activations = self.model.activations(x, layer=layer)
 
         activations = activations.data[0]
-        activations = post_process_activations(activations)
+        # activations = post_process_activations(activations)
+        activations = post_process_activations_simple(activations)
         # activations = [post_process_activations(_a) for _a in activations]
+        # activations = [post_process_activations_simple(_a) for _a in activations]
         return activations
 
     def save_activations(self, x, layer, dst_root):
@@ -102,51 +112,25 @@ class Visalizer(object):
         if not os.path.exists(dst_dir):
             os.makedirs(dst_dir)
 
-        a = Variable(np.eye(2)[[0]].astype(np.float32))
-        fm = self.model(x, stop_layer=layer)
-        fm = self.attention_model.give_attention(fm, a)
-        activations = self.model.activate_by_feature(fm, layer=layer)
-        activations = activations.data[0]
-        activations = post_process_activations(activations)
-        save_im(activations, outdir + '/all_feature0.jpg')
-
-        a = Variable(np.eye(2)[[1]].astype(np.float32))
-        fm = self.model(x, stop_layer=layer)
-        fm = self.attention_model.give_attention(fm, a)
-        activations = self.model.activate_by_feature(fm, layer=layer)
-        activations = activations.data[0]
-        activations = post_process_activations(activations)
-        save_im(activations, outdir + '/all_feature1.jpg')
-
-
-
-# def save_activations(model, x, layer, dst_root):
-#     """Save feature map activations for the given image as images on disk."""
-#
-#     # Create the target directory if it doesn't already exist
-#     dst_dir = os.path.join(dst_root, 'layer_{}/'.format(layer))
-#     dst_dir = os.path.dirname(dst_dir)
-#     if not os.path.exists(dst_dir):
-#         os.makedirs(dst_dir)
-#
-#     print('Computing activations for layer {}...'.format(layer))
-#     activations = get_activations(model, x, layer)
-#
-#     # Save each activation as its own image to later tile them all into
-#     # a single image for a better overview
-#     filename_len = len(str(len(activations)))
-#     for i, activation in enumerate(activations):
-#         im = np.rollaxis(activation, 0, 3)  # c, h, w -> h, w, c
-#         filename = os.path.join(dst_dir,
-#                                 '{num:0{width}}.jpg'  # Pad with zeros
-#                                 .format(num=i, width=filename_len))
-#
-#         print('Saving image {}...'.format(filename))
-#         imgutil.save_im(filename, im)
-#
-#     tiled_filename = os.path.join(dst_root, 'layer_{}.jpg'.format(layer))
-#     print('Saving image {}...'.format(filename))
-#     imgutil.tile_ims(tiled_filename, dst_dir)
+        if a is not None:
+            for idx in a:
+                attention = Variable(np.eye(2)[[idx]].astype(np.float32))
+                fm = self.model(x, stop_layer=layer)
+                fm = self.attention_model.give_attention(fm, attention)
+                activations = self.model.activate_by_feature(fm, layer=layer)
+                activations = activations.data[0]
+                # activations = post_process_activations(activations)
+                # activations = post_process_activations_simple(activations)
+                activations = [post_process_activations_simple(_a) for _a in activations]
+                save_im(activations, outdir + '/all_feature' + str(idx) + '.jpg')
+        else:
+            fm = self.model(x, stop_layer=layer)
+            activations = self.model.activate_by_feature(fm, layer=layer)
+            activations = activations.data[0]
+            # activations = post_process_activations(activations)
+            # activations = post_process_activations_simple(activations)
+            activations = [post_process_activations_simple(_a) for _a in activations]
+            save_im(activations, outdir + '/all_feature.jpg')
 
 
 if __name__ == '__main__':
@@ -175,14 +159,16 @@ if __name__ == '__main__':
 
     model.train = False
 
-    visalizer = Visalizer(model, attention_model=attention_model)
+    visualizer = Visualizer(model, attention_model=attention_model)
 
     size = 224
+    x = Variable(sample_im(size=224))
     # Visualize each of the 5 convolutional layers in VGG
     # for i in range(len(model.convs)):
-    #     save_activations(model, sample_im(size=224), i + 1, outdir)
+    #     visualizer.save_activations(x, i + 1, outdir)
+    visualizer.save_activations(x, 1, outdir)
 
-    x = Variable(sample_im(size=224))
-    visalizer.print_feature_map(x, dst_dir=outdir)
+    # visualizer.print_feature_map(x, dst_dir=outdir, a=[0, 1])
+    # visualizer.print_feature_map(x, dst_dir=outdir)
 
     print('Done')
