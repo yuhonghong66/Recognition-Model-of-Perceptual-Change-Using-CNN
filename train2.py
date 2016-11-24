@@ -103,7 +103,7 @@ try:
             serializers.save_npz(log_dir + '/attention_model' + str(epoch) + '.pkl', attention_model)
             serializers.save_npz(log_dir + '/optimizer' + str(epoch) + '.pkl', optimizer)
             if not use_cpu:
-                model.to_gpu()
+                attention_model.to_gpu()
 
 # save model.
 except Exception as e:
