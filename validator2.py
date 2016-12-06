@@ -105,6 +105,57 @@ class Validator(object):
         print("Print prediction")
         print(pred_t)
 
+    def investigate_feature(self, test=True):
+        print("investigate feature!")
+        arr0 = np.zeros(512)
+        arr1 = np.zeros(512)
+        if test:
+            indexes = range(data.TEST_N)
+        else:
+            indexes = range(data.N)
+
+        for index in indexes:
+            x_batch, t_batch = self.data.get(index=[index], test=test)
+            x = chainer.Variable(np.asarray(x_batch))
+            fm = self.VGG(x, stop_layer=5).data[0]
+            if t_batch[0] == 0:
+                arr0 += np.array([np.average(x) for x in fm])
+            elif t_batch[0] == 1:
+                arr1 += np.array([np.average(x) for x in fm])
+        pass
+
+    def sample_simulate(self):
+        print("simulate!")
+        result = []
+
+        x = chainer.Variable(sample_im(size=self.data.insize))
+        fm = self.VGG(x, stop_layer=5)
+        pred_t = self.model(fm).data[0]
+
+        for _ in range(800):
+            if pred_t[0] > np.random.rand():
+                attention = 0
+            else:
+                attention = 1
+
+            t_batch = [[attention]]
+            a_batch = np.eye(2)[t_batch].astype(np.float32)
+            a = chainer.Variable(np.asarray(a_batch))
+
+            fm = self.VGG(x, stop_layer=5)
+            pred_t = self.model.forward_with_attention(fm, a).data[0]
+
+            result.append(pred_t.argmax())
+
+        print("simulated!")
+
+        plt.plot(range(1, len(result)+1), result)
+        plt.ylim([-0.3, 1.3])
+        plt.tick_params(labelleft='off')
+        plt.savefig('simulate_double.jpg')
+
+        print(result)
+
 
 def sample_im(size=256):
     """Return a preprocessed (averaged and resized to VGG) sample image."""
@@ -138,12 +189,14 @@ if __name__ == '__main__':
     data = Data(k=5, insize=224)
 
     validator = Validator(model, data)
-    validator.validate_all(test=test)
+    # validator.validate_all(test=test)
     # validator.validate_sample(test=test)
     # validator.validate(test=test)
+    # validator.investigate_feature(test=test)
+    validator.sample_simulate()
     if not args.no_attention:
         print("Use attention!")
-        validator.validate_all(test=test, attention=True)
+        # validator.validate_all(test=test, attention=True)
         # validator.validate(test=test, attention=True)
         # validator.validate_sample(test=test, attention=0)
         # validator.validate_sample(test=test, attention=1)
