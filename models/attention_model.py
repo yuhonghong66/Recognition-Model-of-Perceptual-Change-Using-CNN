@@ -30,7 +30,8 @@ class AttentionModel(chainer.Chain):
             return self.pred
 
     def give_attention(self, fm, a):
-        attention = F.sigmoid(self.attention(a))
+        # attention = F.sigmoid(self.attention(a))
+        attention = self.attention(a)
         shape_attention = attention.data.shape + (1, 1)
         attention = F.reshape(attention, shape_attention)
         shape_tile = (1, 1) + fm.data.shape[2:]
