@@ -28,7 +28,7 @@ def save_im(activation, path):
 def sample_im(size=256):
     """Return a preprocessed (averaged and resized to VGG) sample image."""
     # mean = np.array([103.939, 116.779, 123.68])
-    im = cv.imread('images/double.jpg').astype(np.float32)
+    im = cv.imread('images/bill.jpg').astype(np.float32)
     # im -= mean
     im = cv.resize(im, (size, size)).transpose((2, 0, 1))
     im = im[np.newaxis, :, :, :] / 255.0

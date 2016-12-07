@@ -4,6 +4,7 @@ import random
 
 import numpy as np
 import matplotlib.pyplot as plt
+import pylab
 import os
 import cv2 as cv
 try:
@@ -124,43 +125,11 @@ class Validator(object):
                 arr1 += np.array([np.average(x) for x in fm])
         pass
 
-    def sample_simulate(self):
-        print("simulate!")
-        result = []
-
-        x = chainer.Variable(sample_im(size=self.data.insize))
-        fm = self.VGG(x, stop_layer=5)
-        pred_t = self.model(fm).data[0]
-
-        for _ in range(800):
-            if pred_t[0] > np.random.rand():
-                attention = 0
-            else:
-                attention = 1
-
-            t_batch = [[attention]]
-            a_batch = np.eye(2)[t_batch].astype(np.float32)
-            a = chainer.Variable(np.asarray(a_batch))
-
-            fm = self.VGG(x, stop_layer=5)
-            pred_t = self.model.forward_with_attention(fm, a).data[0]
-
-            result.append(pred_t.argmax())
-
-        print("simulated!")
-
-        plt.plot(range(1, len(result)+1), result)
-        plt.ylim([-0.3, 1.3])
-        plt.tick_params(labelleft='off')
-        plt.savefig('simulate_double.jpg')
-
-        print(result)
-
 
 def sample_im(size=256):
     """Return a preprocessed (averaged and resized to VGG) sample image."""
     # mean = np.array([103.939, 116.779, 123.68])
-    im = cv.imread('images/double.jpg').astype(np.float32)
+    im = cv.imread('images/hillary.jpg').astype(np.float32)
     # im -= mean
     im = cv.resize(im, (size, size)).transpose((2, 0, 1))
     im = im[np.newaxis, :, :, :] / 255.0
@@ -192,8 +161,7 @@ if __name__ == '__main__':
     # validator.validate_all(test=test)
     # validator.validate_sample(test=test)
     # validator.validate(test=test)
-    # validator.investigate_feature(test=test)
-    validator.sample_simulate()
+    validator.investigate_feature(test=test)
     if not args.no_attention:
         print("Use attention!")
         # validator.validate_all(test=test, attention=True)
