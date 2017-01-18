@@ -10,14 +10,6 @@ def sample_simulate():
     no_attention = 0.57152784
     attention0 = 0.99874961
     attention1 = 0.01055572
-    # bill
-    # no_attention = 0.01158377
-    # attention0 = 1.0
-    # attention1 = 0.0
-    # hillary
-    # no_attention = 1.0
-    # attention0 = 1.0
-    # attention1 = 0.0017
 
     # x = chainer.Variable(sample_im(size=self.data.insize))
     # fm = self.VGG(x, stop_layer=5)
